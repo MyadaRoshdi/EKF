@@ -89,38 +89,38 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     ekf_.x_ = VectorXd(4);
     ekf_.x_ << 1, 1, 1, 1;
 
-    //if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
+    if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
 
-      /**
+      
       Convert radar from polar to cartesian coordinates and initialize state.
       */
-    	//float rho = measurement_pack.raw_measurements_[0];
-        //float theta = measurement_pack.raw_measurements_[1];
-        //float rho_dot = measurement_pack.raw_measurements_[2];
-        //float px = rho * cos(theta);
-        //float py = rho * sin(theta);
-        //float vx = rho_dot * cos(theta);
-        //float vy = rho_dot * sin(theta);
+    	float rho = measurement_pack.raw_measurements_[0];
+        float theta = measurement_pack.raw_measurements_[1];
+        float rho_dot = measurement_pack.raw_measurements_[2];
+        float px = rho * cos(theta);
+        float py = rho * sin(theta);
+        float vx = rho_dot * cos(theta);
+        float vy = rho_dot * sin(theta);
 
         //set the state with the initial location and  velocity
-        //ekf_.x_ << px, py, vx, vy;
+        ekf_.x_ << px, py, vx, vy;
 
-        //previous_timestamp_ = measurement_pack.timestamp_;
+        previous_timestamp_ = measurement_pack.timestamp_;
 
 
 
-    //}
+    }
 	  
-    if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
+    //if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
       /**
       Initialize state.
       */
       //set the state with the initial location and zero velocity
-      ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 5.199937e+00, 0; // changed the vx initialization value as the gt value 1st row Laser in dataset to get better RMSE[Note: not good for Generalization]
+     // ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 5.199937e+00, 0; // changed the vx initialization value as the gt value 1st row Laser in dataset to get better RMSE[Note: not good for Generalization]
 
-      previous_timestamp_ = measurement_pack.timestamp_;
+     // previous_timestamp_ = measurement_pack.timestamp_;
 
-    }
+   // }
 
     // done initializing, no need to predict or update
     is_initialized_ = true;
@@ -174,24 +174,24 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
      * Update the state and covariance matrices.
    */
 
- // if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
+  if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
 
 	  
      // Hj_ is used to calculate S,K and P
-	 // Hj_ = tools.CalculateJacobian(ekf_.x_);
-	  //ekf_.R_ = R_radar_;
-	  //ekf_.H_ = Hj_;
-	  //ekf_.UpdateEKF(measurement_pack.raw_measurements_);
+	  Hj_ = tools.CalculateJacobian(ekf_.x_);
+	  ekf_.R_ = R_radar_;
+	  ekf_.H_ = Hj_;
+	  ekf_.UpdateEKF(measurement_pack.raw_measurements_);
     // Radar updates
-  //} 
-    if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
+  } 
+    //if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
     // Laser updates
 
 	
-	 ekf_.R_ = R_laser_;
-	 ekf_.H_ = H_laser_;
-	 ekf_.Update(measurement_pack.raw_measurements_);
-  }
+	 //ekf_.R_ = R_laser_;
+	 //ekf_.H_ = H_laser_;
+	 //ekf_.Update(measurement_pack.raw_measurements_);
+  //}
 
   // print the output
   cout << "x_ = " << ekf_.x_ << endl;
