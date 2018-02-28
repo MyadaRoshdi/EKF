@@ -92,8 +92,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
 
       
-      Convert radar from polar to cartesian coordinates and initialize state.
-      */
+     // Convert radar from polar to cartesian coordinates and initialize state.
+      
     	float rho = measurement_pack.raw_measurements_[0];
         float theta = measurement_pack.raw_measurements_[1];
         float rho_dot = measurement_pack.raw_measurements_[2];
